@@ -13,6 +13,7 @@
   "notif7": "*WARNING*\n•───────────────•\nDeposit tidak dapat dilakukan karna tidak ditemukan command deposit.",
   "notif8": "*WARNING*\n•───────────────•\nGroup Telah Terdaftar, tidak dapat mendaftarkan ulang.",
   "notif9": "*WARNING*\n•───────────────•\nGroup Tidak Terdaftar, silahkan daftarkan terlebih dahulu.",
+  "notif10": "*WARNING*\n•───────────────•\nIni menu khusus admin, anggota tidak dapat menggunakannya.",
   "format1": "*FORMAT SALAH*\n•───────────────•\nFormat yang benar adalah sebagai berikut :\nOrder [SKU] [Nomor Tujuan]\n\nContoh: Order wdp 17262408671719",
   "format2": "*FORMAT SALAH*\n•───────────────•\nFormat yang benar adalah sebagai berikut :\nConfig Sign [New Data]\n\nContoh: Config sign ❐",
   "format3": "*FORMAT SALAH*\n•───────────────•\nFormat yang benar adalah sebagai berikut :\nConfig Payment [Brand].[Rekening].[Atas Nama]\n\nContoh: Config payment E-wallet Dana.081316658899.Johan Saka Wikarta"

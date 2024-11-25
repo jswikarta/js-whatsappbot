@@ -32,7 +32,7 @@ export async function GroupModule(wbot, message) {
   const messageHead = messageText.split(" ")[0].toLowerCase();
   const messageBody = messageText.split(" ").slice(1).join(" ");
 
-  const botOwner = `6281316658899@s.whatsapp.net`;
+  const botOwner = `${process.env.PHONE}@s.whatsapp.net`;
   const botPhone = wbot.user.id.split(":")[0] + "@s.whatsapp.net";
   const fromOwner = messageFrom === botOwner ? true : false;
 
@@ -221,6 +221,12 @@ export async function GroupModule(wbot, message) {
    * FUNCTION REPLY TERIMA
   -------------------------- */
   async function ReplyTerima() {
+    if (!fromAdmin)
+      return await wbot.sendMessage(messageRjid, {
+        text: note.notif10,
+        mentions: [messageFrom],
+      });
+
     const dataTerima = messageMssg.extendedTextMessage.contextInfo;
     const textTerima = dataTerima.quotedMessage.imageMessage.caption;
 
@@ -462,36 +468,59 @@ export async function GroupModule(wbot, message) {
    * FUNCTION REPLY CONFIG OTHER
   -------------------------- */
   async function ReplyConfigOther() {
-    if (fromAdmin) {
-      if (!groupConf)
-        return await wbot.sendMessage(messageRjid, {
-          text: note.notif8,
-          mentions: [messageFrom],
-        });
-
-      const configHead = messageBody.split(" ")[0];
-      const configBody = messageBody.split(" ")[1];
-
-      if (!configBody)
-        return await wbot.sendMessage(messageRjid, {
-          text: note.format2,
-          mentions: [messageFrom],
-        });
-
-      if (configHead === "sign") groupConf.groupSign = configBody;
-      if (configHead === "profit") groupConf.groupProfit = configBody;
-
-      UpdateGroup(groupConf);
-      let messageSend = `*GROUP BERHASIL DIUPDATE*` + note.bot3;
-      await wbot.sendMessage(messageRjid, {
-        text: messageSend,
+    if (!fromAdmin)
+      return await wbot.sendMessage(messageRjid, {
+        text: note.notif10,
         mentions: [messageFrom],
       });
 
-      await wbot.sendMessage(messageRjid, {
-        delete: message.key,
+    if (!groupConf)
+      return await wbot.sendMessage(messageRjid, {
+        text: note.notif8,
+        mentions: [messageFrom],
       });
+
+    const configHead = messageBody.split(" ")[0];
+    const configBody = messageBody.split(" ")[1];
+
+    if (!configBody)
+      return await wbot.sendMessage(messageRjid, {
+        text: note.format2,
+        mentions: [messageFrom],
+      });
+
+    switch (configHead) {
+      case "sign":
+        groupConf.groupSign = configBody;
+        break;
+      case "profit":
+        groupConf.groupProfit = configBody;
+      case "add.pay":
+        {
+          const newPayment = configBody.split(".");
+          const payBrand = newPayment[0];
+          const payRekening = newPayment[1];
+          const payAtasnama = newPayment[2];
+
+          if (!payBrand || !payRekening || !payAtasnama)
+            return await wbot.sendMessage(messageRjid, {
+              text: note.format3,
+              mentions: [messageFrom],
+            });
+        }
+        break;
     }
+
+    UpdateGroup(groupConf);
+    let messageSend = `*GROUP BERHASIL DIUPDATE*` + note.bot3;
+    await wbot.sendMessage(messageRjid, {
+      text: messageSend,
+      mentions: [messageFrom],
+    });
+
+    await wbot.sendMessage(messageRjid, {
+      delete: message.key,
+    });
   }
 }
 
