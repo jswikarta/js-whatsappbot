@@ -489,27 +489,8 @@ export async function GroupModule(wbot, message) {
         mentions: [messageFrom],
       });
 
-    switch (configHead) {
-      case "sign":
-        groupConf.groupSign = configBody;
-        break;
-      case "profit":
-        groupConf.groupProfit = configBody;
-      case "add.pay":
-        {
-          const newPayment = configBody.split(".");
-          const payBrand = newPayment[0];
-          const payRekening = newPayment[1];
-          const payAtasnama = newPayment[2];
-
-          if (!payBrand || !payRekening || !payAtasnama)
-            return await wbot.sendMessage(messageRjid, {
-              text: note.format3,
-              mentions: [messageFrom],
-            });
-        }
-        break;
-    }
+    if (configHead === "sign") groupConf.groupSign = configBody;
+    if (configHead === "profit") groupConf.groupSign = configBody;
 
     UpdateGroup(groupConf);
     let messageSend = `*GROUP BERHASIL DIUPDATE*` + note.bot3;
@@ -549,23 +530,4 @@ function TrxRef() {
   let y = date.getFullYear();
 
   return "FGS" + y + m + d + Number(h + i + s);
-}
-
-/** -------------------------
- * FUNCTION TRX INVOICE
--------------------------- */
-function TrxInvoice() {
-  let date = new Date();
-  let h = date.getHours();
-  let i = date.getMinutes();
-  let s = date.getSeconds();
-  let d = date.getDate();
-  let m = date.getMonth() + 1;
-  let y = date.getFullYear();
-
-  h = h.toString().length < 2 ? (h = `0${h}`) : h;
-  i = i.toString().length < 2 ? (i = `0${i}`) : i;
-  s = s.toString().length < 2 ? (s = `0${s}`) : s;
-  d = d.toString().length < 2 ? (d = `0${d}`) : d;
-  m = m.toString().length < 2 ? (m = `0${m}`) : m;
 }
