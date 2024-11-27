@@ -71,9 +71,9 @@ export async function GroupModule(wbot, message) {
 
   if (botAdmin)
     switch (messageHead) {
-      case `h`:
-      case `htag`:
-      case `hidetag`:
+      case "h":
+      case "htag":
+      case "hidetag":
         {
           if (!fromAdmin) break;
           await wbot.sendMessage(messageRjid, {
@@ -82,32 +82,36 @@ export async function GroupModule(wbot, message) {
           });
         }
         break;
-      case `config`:
+      case "config":
         {
           const configHead = messageBody.split(" ")[0];
           if (configHead === "group") await ReplyConfigGroup();
           else ReplyConfigOther();
         }
         break;
-      case `info`:
+      case "add":
+        if (groupConf) await ReplyAdd();
+        break;
+      case "info":
         if (groupConf && !messageBody) await ReplyInfo();
         break;
-      case `menu`:
+      case "menu":
         if (groupConf && !messageBody) await ReplyMenu();
         break;
-      case `pay`:
-      case `payment`:
+      case "pay":
+      case "payment":
         if (groupConf && !messageBody) await ReplyPay();
         break;
-      case `depo`:
-      case `deposit`:
+      case "depo":
+      case "deposit":
         if (groupConf) await ReplyDepo();
         break;
-      case `ok`:
-      case `terima`:
+      case "ok":
+      case "terima":
         if (groupConf) await ReplyTerima();
         break;
-      case `order`:
+      case "order":
+      case "trxproses":
         if (groupConf) await ReplyOrder();
         break;
       default:
@@ -142,8 +146,6 @@ export async function GroupModule(wbot, message) {
         `\n${groupSign} *Profit :* ${groupProfit}` +
         `\n•───────────────•\n` +
         `\n${groupSign} config sign` +
-        `\n${groupSign} config digiuser` +
-        `\n${groupSign} config digikey` +
         `\n${groupSign} config profit` +
         `\n${groupSign} config payment` +
         `\n${groupSign} config category` +
@@ -337,7 +339,6 @@ export async function GroupModule(wbot, message) {
    * FUNCTION REPLY ORDER
   -------------------------- */
   async function ReplyOrder() {
-    const trxFrom = messageFrom.split("@")[0];
     const trxSku = messageBody.split(" ")[0];
     const trxId = messageBody.split(" ")[1];
     const trxRef = TrxRef();
@@ -503,6 +504,91 @@ export async function GroupModule(wbot, message) {
       delete: message.key,
     });
   }
+
+  /** -------------------------
+   * FUNCTION REPLY ADD
+  -------------------------- */
+  async function ReplyAdd() {
+    if (!fromAdmin)
+      return await wbot.sendMessage(messageRjid, {
+        text: note.notif10,
+        mentions: [messageFrom],
+      });
+
+    const addHead = messageBody.split(" ")[0].toLowerCase();
+    const addBody = messageBody.split(" ").slice(1).join(" ");
+
+    let messageSend =
+      `*LIST COMMAND ADD*` +
+      `\n•───────────────•\n` +
+      `\n${groupSign} add payment` +
+      `\n${groupSign} add category`;
+
+    if (!addHead)
+      return await wbot.sendMessage(messageRjid, {
+        text: messageSend + note.bot1,
+        mentions: [messageFrom],
+      });
+
+    switch (addHead) {
+      case "pay":
+      case "payment":
+        {
+          if (!addBody)
+            return await wbot.sendMessage(messageRjid, {
+              text: note.format3,
+              mentions: [messageFrom],
+            });
+
+          const newPayment = addBody.split(".");
+          const newBrand = newPayment[0];
+          const newRekening = newPayment[1];
+          const newAtasnama = newPayment[2];
+
+          console.log(addBody, newPayment);
+          if (!newBrand || !newRekening || !newAtasnama)
+            return await wbot.sendMessage(messageRjid, {
+              text: note.format3,
+              mentions: [messageFrom],
+            });
+
+          groupConf.groupPayment.push({
+            brand: newBrand,
+            rekening: newRekening,
+            atasnama: newAtasnama,
+          });
+
+          UpdateGroup(groupConf);
+          await wbot.sendMessage(messageRjid, {
+            text: note.notif11,
+            mentions: [messageFrom],
+          });
+        }
+        break;
+
+      case "cat":
+      case "category":
+        {
+          const newCategory = addBody.replace(/[^a-zA-Z]/g, "");
+          const addCategory = newCategory.toLowerCase();
+
+          if (!addCategory)
+            return await wbot.sendMessage(messageRjid, {
+              text: note.format4,
+              mentions: [messageFrom],
+            });
+
+          groupConf.groupCategory.push(addCategory);
+
+          UpdateGroup(groupConf);
+          await wbot.sendMessage(messageRjid, {
+            text: note.notif12,
+            mentions: [messageFrom],
+          });
+        }
+        break;
+    }
+  }
 }
 
 /** -------------------------
@@ -529,5 +615,5 @@ function TrxRef() {
   let m = date.getMonth() + 1;
   let y = date.getFullYear();
 
-  return "FGS" + y + m + d + Number(h + i + s);
+  return "FGS" + Number(y - 2000) + m + d + h + i + s;
 }

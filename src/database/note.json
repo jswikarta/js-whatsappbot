@@ -14,8 +14,11 @@
   "notif8": "*WARNING*\n•───────────────•\nGroup Telah Terdaftar, tidak dapat mendaftarkan ulang.",
   "notif9": "*WARNING*\n•───────────────•\nGroup Tidak Terdaftar, silahkan daftarkan terlebih dahulu.",
   "notif10": "*WARNING*\n•───────────────•\nIni menu khusus admin, anggota tidak dapat menggunakannya.",
+  "notif11": "*SUCCESS*\n•───────────────•\nPayment baru berhasil didaftarkan, silahkan ketik PAY untuk melihat.",
+  "notif12": "*SUCCESS*\n•───────────────•\nPayment baru berhasil didaftarkan, silahkan ketik MENU untuk melihat.",
   "format1": "*FORMAT SALAH*\n•───────────────•\nFormat yang benar adalah sebagai berikut :\nOrder [SKU] [Nomor Tujuan]\n\nContoh: Order wdp 17262408671719",
   "format2": "*FORMAT SALAH*\n•───────────────•\nFormat yang benar adalah sebagai berikut :\nConfig Sign [New Data]\n\nContoh: Config sign ❐",
-  "format3": "*FORMAT SALAH*\n•───────────────•\nFormat yang benar adalah sebagai berikut :\nConfig add.pay [Brand].[Rekening].[Atas Nama]\n\nContoh: Config add.pay E-wallet Dana.081316658899.Johan Saka Wikarta",
+  "format3": "*FORMAT SALAH*\n•───────────────•\nFormat yang benar adalah sebagai berikut :\nAdd payment [Brand].[Rekening].[Atas Nama]\n\nContoh: Add payment E-wallet Dana.081316658899.Johan Saka Wikarta",
+  "format4": "*FORMAT SALAH*\n•───────────────•\nFormat yang benar adalah sebagai berikut :\nAdd category [New Category]\n\nContoh: Add category topupgames",
   "format6": "*FORMAT SALAH*\n•───────────────•\nFormat yang benar adalah sebagai berikut :\nConfig del.pay [Rekening]\n\nContoh: Config del.pay 081316658899"
 }
