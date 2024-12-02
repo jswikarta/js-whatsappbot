@@ -147,9 +147,9 @@ export async function GroupModule(wbot, message) {
         `\n•───────────────•\n` +
         `\n${groupSign} config sign` +
         `\n${groupSign} config profit` +
-        `\n${groupSign} config payment` +
-        `\n${groupSign} config category` +
-        `\n${groupSign} config product`;
+        `\n${groupSign} add payment` +
+        `\n${groupSign} add category` +
+        `\n${groupSign} add product`;
 
       await wbot.sendMessage(messageFrom, { text: messageSend });
     }
@@ -522,7 +522,8 @@ export async function GroupModule(wbot, message) {
       `*LIST COMMAND ADD*` +
       `\n•───────────────•\n` +
       `\n${groupSign} add payment` +
-      `\n${groupSign} add category`;
+      `\n${groupSign} add category` +
+      `\n${groupSign} add product`;
 
     if (!addHead)
       return await wbot.sendMessage(messageRjid, {
@@ -583,6 +584,43 @@ export async function GroupModule(wbot, message) {
           UpdateGroup(groupConf);
           await wbot.sendMessage(messageRjid, {
             text: note.notif12,
+            mentions: [messageFrom],
+          });
+        }
+        break;
+
+      case "product":
+        {
+          const newProduct = addBody.split(".");
+          const newCode = newProduct[0];
+          const newBrand = newProduct[1];
+          const newProfit = newProduct[2];
+          const newCategory = newProduct[3];
+          const cekCategory = groupCategory.filter((i) => i === newCategory);
+
+          if (!newCode || !newBrand || !newProfit || !newCategory)
+            return await wbot.sendMessage(messageRjid, {
+              text: note.format5,
+              mentions: [messageFrom],
+            });
+
+          if (!cekCategory.length)
+            return await wbot.sendMessage(messageRjid, {
+              text: note.notif13,
+              mentions: [messageFrom],
+            });
+
+          groupConf.groupProduct.push({
+            code: newCode,
+            brand: newBrand,
+            profit: newProfit,
+            category: newCategory,
+          });
+
+          UpdateGroup(groupConf);
+          const messageSend = note.notif14 + `*${newCategory}* untuk melihat.`;
+          await wbot.sendMessage(messageRjid, {
+            text: messageSend,
             mentions: [messageFrom],
           });
         }
