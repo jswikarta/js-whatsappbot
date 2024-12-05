@@ -17,23 +17,27 @@ This is a WhatsApp bot integrated with the **Digiflazz API** that allows users t
 
 ## Installation
 
-1. **Clone this repository to your system**
+1. **Clone this repository to your system:**
+
 ```bash
 git clone https://github.com/jswikarta/js-whatsappbot.git
 cd js-whatsappbot
 ```
 
-2. **Install the required dependencies**
+2. **Install the required dependencies:**
+
 Ensure you have Node.js and npm installed. Then, run the following command to install the dependencies:
 ```bash
 npm install
 ```
 
-3. **Run the WhatsApp Bot**
+3. **Run the WhatsApp Bot:**
+
 After installation, you can start the bot using the following command:
 ```bash
 node .
 ```
+
 ## Connection & List Command
 After run whatsappbot open your phone and scan whatsapp qr-code to connect whatsappbot. Here some command to use:
 - Config Group : register whatsapp group
