@@ -19,8 +19,8 @@ This is a WhatsApp bot integrated with the **Digiflazz API** that allows users t
 
 1. **Clone this repository to your system:**
 ```bash
-git clone https://github.com/username/whatsapp-bot-digiflazz.git
-cd whatsapp-bot-digiflazz
+git clone https://github.com/jswikarta/js-whatsappbot.git
+cd js-whatsappbot
 ```
 
 2. **Install the required dependencies:**
