@@ -35,11 +35,10 @@ After installation, you can start the bot using the following command:
 node .
 ```
 ## Connection & List Command
-
-1. **Connect to Whatsappbot**
-After run whatsappbot open your phone and scan whatsapp qr-code to connect whatsappbot.
-
-2. **List Command**
+After run whatsappbot open your phone and scan whatsapp qr-code to connect whatsappbot. Here some command to use:
 - Config Group : register whatsapp group
 - Info : to check group config
 - Menu : to check list user command
+
+## License
+This project is licensed under the MIT License.
