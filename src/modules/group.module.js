@@ -45,6 +45,8 @@ export async function GroupModule(wbot, message) {
   const groupConf = GetConfig(groupId);
   const groupSign = groupConf?.groupSign;
   const groupProfit = groupConf?.groupProfit;
+  const groupDigikey = groupConf?.groupDigikey;
+  const groupDigiuser = groupConf?.groupDigiuser;
   const groupBalance = groupConf?.groupBalance;
   const groupPayment = groupConf?.groupPayment;
   const groupCategory = groupConf?.groupCategory;
@@ -83,11 +85,7 @@ export async function GroupModule(wbot, message) {
         }
         break;
       case "config":
-        {
-          const configHead = messageBody.split(" ")[0];
-          if (configHead === "group") await ReplyConfigGroup();
-          else ReplyConfigOther();
-        }
+        await ReplyConfig();
         break;
       case "add":
         if (groupConf) await ReplyAdd();
@@ -126,10 +124,15 @@ export async function GroupModule(wbot, message) {
   -------------------------- */
   async function ReplyInfo() {
     if (fromAdmin) {
-      const digiBalance = await DigiBalance();
+      const digiBalance = await DigiBalance(groupDigikey, groupDigiuser);
       if (digiBalance?.rc === "83")
         return await wbot.sendMessage(messageRjid, {
           text: note.notif4,
+        });
+
+      if (digiBalance?.rc === "42")
+        return await wbot.sendMessage(messageRjid, {
+          text: note.notif14,
         });
 
       let totalBalance = 0;
@@ -147,6 +150,8 @@ export async function GroupModule(wbot, message) {
         `\n•───────────────•\n` +
         `\n${groupSign} config sign` +
         `\n${groupSign} config profit` +
+        `\n${groupSign} config digikey` +
+        `\n${groupSign} config digiuser` +
         `\n${groupSign} add payment` +
         `\n${groupSign} add category` +
         `\n${groupSign} add product`;
@@ -167,7 +172,8 @@ export async function GroupModule(wbot, message) {
       `\n${groupSign} *💵 :* ${Fnumber(userBalance)}` +
       `\n•───────────────•\n` +
       `\n${groupSign} pay` +
-      `\n${groupSign} depo`;
+      `\n${groupSign} depo` +
+      `\n${groupSign} order`;
 
     for (let category of groupCategory) {
       messageSend += `\n${groupSign} ${category}`;
@@ -283,11 +289,16 @@ export async function GroupModule(wbot, message) {
     const product = groupProduct.filter((i) => i.code === messageHead)[0];
 
     if (product) {
-      const digiProduct = await DigiProduct();
+      const digiProduct = await DigiProduct(groupDigikey, groupDigiuser);
       if (digiProduct?.rc === "83")
         return await wbot.sendMessage(messageRjid, {
           text: note.notif4,
           mentions: [messageFrom],
+        });
+
+      if (digiProduct?.rc === "42")
+        return await wbot.sendMessage(messageRjid, {
+          text: note.notif14,
         });
 
       const digiProduct2 = digiProduct
@@ -349,8 +360,14 @@ export async function GroupModule(wbot, message) {
         mentions: [messageFrom],
       });
 
-    const digiProduct = await DigiProduct();
+    const digiProduct = await DigiProduct(groupDigikey, groupDigiuser);
     if (digiProduct?.rc === "83")
+      return await wbot.sendMessage(messageRjid, {
+        text: note.notif4,
+        mentions: [messageFrom],
+      });
+
+    if (digiProduct?.rc === "42")
       return await wbot.sendMessage(messageRjid, {
         text: note.notif4,
         mentions: [messageFrom],
@@ -387,7 +404,13 @@ export async function GroupModule(wbot, message) {
     });
 
     if (!fromAdmin) UpdateBalance(groupConf, messageFrom, trxPrice * -1);
-    const trxResult = await DigiTransaction(trxRef, trxId, trxSku);
+    const trxResult = await DigiTransaction(
+      groupDigikey,
+      groupDigiuser,
+      trxRef,
+      trxId,
+      trxSku
+    );
 
     let messageSend = "";
     if (trxResult?.rc === "00") {
@@ -412,7 +435,7 @@ export async function GroupModule(wbot, message) {
           `\n_Pesanan anda berhasil diproses, terimakasih sudah order._`;
         await wbot.sendMessage(messageFrom, { text: messageUser });
       }
-    } else {
+    } else if (trxResult?.rc === "02") {
       messageSend =
         `*ORDER ${trxRef} FAILED*` +
         `\n•───────────────•` +
@@ -437,72 +460,94 @@ export async function GroupModule(wbot, message) {
   }
 
   /** -------------------------
-   * FUNCTION REPLY CONFIG GROUP
+   * FUNCTION REPLY CONFIG
   -------------------------- */
-  async function ReplyConfigGroup() {
-    if (fromOwner) {
-      if (groupConf)
-        return await wbot.sendMessage(messageRjid, {
-          text: note.notif8,
-          mentions: [messageFrom],
-        });
-
-      UpdateGroup({
-        groupId: groupId,
-        groupSign: "❐",
-        groupProfit: 1.5,
-        groupBalance: [],
-        groupPayment: [],
-        groupCategory: [],
-        groupProduct: [],
-      });
-
-      let messageSend = `*GROUP BERHASIL DIDAFTARKAN*` + note.bot3;
-      await wbot.sendMessage(messageRjid, {
-        text: messageSend,
-        mentions: [messageFrom],
-      });
-    }
-  }
-
-  /** -------------------------
-   * FUNCTION REPLY CONFIG OTHER
-  -------------------------- */
-  async function ReplyConfigOther() {
-    if (!fromAdmin)
-      return await wbot.sendMessage(messageRjid, {
-        text: note.notif10,
-        mentions: [messageFrom],
-      });
-
-    if (!groupConf)
-      return await wbot.sendMessage(messageRjid, {
-        text: note.notif8,
-        mentions: [messageFrom],
-      });
-
-    const configHead = messageBody.split(" ")[0];
+  async function ReplyConfig() {
+    const configHead = messageBody.split(" ")[0].toLowerCase();
     const configBody = messageBody.split(" ")[1];
 
-    if (!configBody)
-      return await wbot.sendMessage(messageRjid, {
-        text: note.format2,
-        mentions: [messageFrom],
-      });
+    switch (configHead) {
+      case "group":
+        {
+          if (fromOwner) {
+            if (groupConf)
+              return await wbot.sendMessage(messageRjid, {
+                text: note.notif8,
+                mentions: [messageFrom],
+              });
 
-    if (configHead === "sign") groupConf.groupSign = configBody;
-    if (configHead === "profit") groupConf.groupSign = configBody;
+            UpdateGroup({
+              groupId: groupId,
+              groupSign: "❐",
+              groupProfit: 1.5,
+              groupDigikey: "",
+              groupDigiuser: "",
+              groupBalance: [],
+              groupPayment: [],
+              groupCategory: [],
+              groupProduct: [],
+            });
 
-    UpdateGroup(groupConf);
-    let messageSend = `*GROUP BERHASIL DIUPDATE*` + note.bot3;
-    await wbot.sendMessage(messageRjid, {
-      text: messageSend,
-      mentions: [messageFrom],
-    });
+            let messageSend = `*GROUP BERHASIL DIDAFTARKAN*` + note.bot3;
+            await wbot.sendMessage(messageRjid, {
+              text: messageSend,
+              mentions: [messageFrom],
+            });
+          }
+        }
+        break;
 
-    await wbot.sendMessage(messageRjid, {
-      delete: message.key,
-    });
+      case "sign":
+      case "profit":
+      case "digikey":
+      case "digiuser":
+        {
+          if (!fromAdmin)
+            return await wbot.sendMessage(messageRjid, {
+              text: note.notif10,
+              mentions: [messageFrom],
+            });
+
+          if (!groupConf)
+            return await wbot.sendMessage(messageRjid, {
+              text: note.notif8,
+              mentions: [messageFrom],
+            });
+
+          if (!configBody)
+            return await wbot.sendMessage(messageRjid, {
+              text: note.format2,
+              mentions: [messageFrom],
+            });
+
+          switch (configHead) {
+            case "sign":
+              groupConf.groupSign = configBody;
+              break;
+            case "profit":
+              groupConf.groupProfit = configBody;
+              break;
+            case "digikey":
+              groupConf.groupDigikey = configBody;
+              break;
+            case "digiuser":
+              groupConf.groupDigiuser = configBody;
+              break;
+          }
+
+          UpdateGroup(groupConf);
+          let messageSend = `*GROUP BERHASIL DIUPDATE*` + note.bot3;
+          await wbot.sendMessage(messageRjid, {
+            text: messageSend,
+            mentions: [messageFrom],
+          });
+
+          await wbot.sendMessage(messageRjid, {
+            delete: message.key,
+          });
+        }
+        break;
+    }
   }
 
   /** -------------------------
